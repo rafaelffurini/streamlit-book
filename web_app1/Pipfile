@@ -10,6 +10,11 @@ spacy = "*"
 neattext = "*"
 matplotlib = "*"
 wordcloud = "*"
+deep-translator = "*"
+polyglot = "*"
+pycld2 = "*"
+icu = "*"
+pyicu = "==2.14"
 
 [dev-packages]
 

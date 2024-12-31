@@ -7,12 +7,45 @@ st.set_page_config(page_title="NLP Web App", page_icon=":thumbsup:", layout="cen
 import spacy
 import neattext as nt
 from textblob import TextBlob
+from deep_translator import GoogleTranslator
+
+
+
+from collections import Counter
+import re
 
 # Viz Pkgs
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use("Agg")
 from wordcloud import WordCloud
+
+
+def summarize_text(text, num_sentences=3):
+    clean_text = re.sub('[^a-zA-z]', ' ', text).lower()
+
+    words = clean_text.split()
+
+    word_freq = Counter(words)
+
+    print(word_freq.get)
+
+    sorted_words = sorted(word_freq, key=word_freq.get, reverse=True)
+
+    top_words = sorted_words[:num_sentences]
+
+    summary = ' '.join(top_words)
+
+    return summary
+
+def text_analyzer(text):
+    nlp = spacy.load('en_core_web_sm')
+
+    doc = nlp(text)
+
+    allData = [('"Token":{},\n"Lemma":{}'.format(token.text, token.lemma_)) for token in doc]
+
+    return allData
 
 def main():
     """ NLP Web app With Streamlit"""
@@ -85,15 +118,51 @@ def main():
                 with col3:
                     with st.expander("Tokens$Lemmas"):
                         st.write("T&K")
+                        processed_text_mid = str(nt.TextFrame(raw_text).remove_stopwords())
+                        processed_text_mid = str(nt.TextFrame(processed_text_mid).remove_puncts())
+                        processed_text_fin = str(nt.TextFrame(processed_text_mid).remove_special_characters())
+                        tandl = text_analyzer(processed_text_fin)
+                        st.json(tandl)
                 with col4:
                     with st.expander("Summarize"):
-                        st.success("Summarize")
+                        summary = summarize_text(raw_text)
+                        st.success(summary)
     if choice == "Sentiment Analysis":
         st.subheader("Sentiment Analysis")
         st.write("")
+        st.write("")
+
+        raw_text = st.text_area("Text to Analyse", "Enter a text here ...", height=200)
+        if st.button("Evaluate"):
+            if len(raw_text) == 0:
+                st.warning("Enter a text...")
+            else:
+                blob = TextBlob(raw_text)
+                blob = Text(raw_text)
+                st.info("Sentiment Analysis")
+                st.write(blob.sentiment)                
+                st.write("")
     if choice == "Translation":
         st.subheader("Translation")
         st.write("")
+        st.write("")
+        raw_text = st.text_area("Original Text", "Write Something to be translated", height=200)
+        if len(raw_text) < 3:
+            st.warning("Please provide a text with at least 3 characters")
+        else:
+            target_lang = st.selectbox("Target a language", ["German", "Spanish", "Brazilian Portuguese", "French"])
+            if target_lang == 'German':
+                target_lang = 'de'
+            elif target_lang == 'Spanish':
+                target_lang = 'es'
+            elif target_lang == 'Brazilian Portuguese':
+                target_lang = 'pt'
+            elif target_lang == 'French':
+                target_lang = 'fr'
+            if st.button("Translate"):
+                translator = GoogleTranslator(source='auto', target=target_lang)
+                translated_text = translator.translate(raw_text)
+                st.write(translated_text)
     if choice == "About":
         st.subheader("About")
         st.write("")
@@ -105,3 +174,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print(GoogleTranslator().get_supported_languages())
+    
