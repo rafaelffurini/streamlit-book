@@ -138,7 +138,7 @@ def main():
                 st.warning("Enter a text...")
             else:
                 blob = TextBlob(raw_text)
-                blob = Text(raw_text)
+                
                 st.info("Sentiment Analysis")
                 st.write(blob.sentiment)                
                 st.write("")
